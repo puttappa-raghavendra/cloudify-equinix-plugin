@@ -4,31 +4,51 @@ imports:
   - cloudify/types/types.yaml
   # you import you plugin after building the wagon 
   # and uploading it to the manager
-  - plugin:ENTER-PLUGIN-NAME-HERE
+  - plugin:cloudify-equinix-metal-plugin
 
 inputs:
 
-  host_ip:
+  project_id:
     type: string
-    default: 'localhost'
-  host_username:
+  api_key:
     type: string
-    default: 'my_user'
-  host_password:
+  hostname:
     type: string
-    default: 'super_secret_password' # you can also use {get_secret: my_password} for example
+  metro:
+    type: string
+    constraints:
+      - valid_values: ['SV', 'AM', 'NY', 'DC', 'FR']
+    default: SV
+  plan:
+    type: string
+    constraints:
+      - valid_values: ['c3.small.x86', 'c3.medium.x86']
+    default: c3.small.x86
+  operating_system:
+    type: string
+    constraints:
+      - valid_values: ['ubuntu_22_04']
+    default: ubuntu_22_04
+  userdata:
+    type: string
+    default: ''
 
 dsl_definitions:
 
-  host_config: &host_config
-    mock_host: {get_input: host_ip}
-    mock_username: {get_input: host_username}
-    mock_password: {get_input: host_password}
+  equinix_config: &equinix_config
+    project_id: { get_input: project_id }
+    api_key: { get_input: api_key }
+    hostname: { get_input: hostname }
+    metro: { get_input: metro }
+    plan: { get_input: plan }
+    operating_system: { get_input: operating_system }
 
 node_templates:
 
   # actual node to be created with the type defined in the plugin
-  server_check:
-    type: cloudify.nodes.template.MockHost
+  equinix_metal:
+    type: cloudify.nodes.template.EquinixMetal
     properties:
-      host_config: *host_config
+      equinix_config: *equinix_config
+
+  

@@ -14,11 +14,11 @@ plugins:
     # plugin going through `pip` installation on each and every agent (thus requiring
     # access to the `pip` repository/mirror, compilers and so forth).
     # Usage of plugin Wagon files, whenever possible, is recommended.
-    source: https://github.com/cloudify-cosmo/cloudify-plugin-template/archive/master.zip
+    # source: https://github.com/cloudify-cosmo/cloudify-plugin-template/archive/master.zip
 
     # The plugin's name, as it is known to Cloudify Manager. Cloudify Manager uses this
     # name to index the plugin in the plugins table.
-    package_name: 'ENTER-PLUGIN-NAME-HERE'
+    package_name: 'cloudify-equinix-metal-plugin'
 
     # The plugin's version. NOTE - it is recommended that this value is quoted, in order to
     # ensure it passes YAML parsing as a string (by default, the value "1.0" [without quotes]
@@ -28,45 +28,76 @@ plugins:
 data_types:
 
   # you can build your data types for the properties that you will use inside the node_types
-  cloudify.types.template.MockedConfig:
+  cloudify.types.template.EquinixMetalConfig:
     properties:
-      mock_host:
-        description: mock host.
+      project_id:
+        description: Your Equinix project id.
         type: string
         default: ''
         required: true
-      mock_username:
-        description: mock username.
+      api_key:
+        description: Your Equinix api key.
         type: string
         default: ''
-      mock_password:
-        description: mock password.
+        required: true
+      hostname:
+        description: hostname.
         type: string
         default: ''
+        required: true
+      metro:
+        description: Your Equinix location.
+        type: string
+        default: 'SV'
+        required: true
+      plan: 
+        description: Your Equinix Metal plan.
+        type: string
+        default: 'c3.small.x86'
+        required: true
+      operating_system:
+        description: Your Equinix Metal operating system.
+        type: string
+        default: 'ubuntu_22_04'
+        required: true
+      userdata:
+        description: Your Equinix Metal userdata.
+        type: string
+        default: ''
+        required: false
 
 dsl_definitions:
 
   # you can define custom dsl defintions 
   # [ anchors that you can use to define common values or definitions between node definitions ]
-  host_config: &host_config
-    host_config:
-      type: cloudify.types.template.MockedConfig
-      description: Your mocked host configuration.
+  equinix_config: &equinix_config
+    equinix_config:
+      type: cloudify.types.template.EquinixMetalConfig
+      description: Your Equinix Project configuration.
       required: true
 
 node_types:
 
   # you can define your node_types here 
-  cloudify.nodes.template.MockHost:
+  cloudify.nodes.template.EquinixMetal:
     # you can use the derived_form 
     # [ to inherit the properties and interfaces of the node you are referencing ]
     derived_from: cloudify.nodes.Root
     # here you can add the properties that is relevant for you to interact with from the plugin python code
     properties:
-      <<: *host_config
+      <<: *equinix_config
     interfaces:
       # you can define the lifecycle operation 
       # and whatever operation that you may need this node_type to support
       cloudify.interfaces.lifecycle:
         create:
-          implementation: plugin_name.plugin.tasks.my_task
+          implementation: plugin_name.plugin.tasks.create
+        delete:
+          implementation: plugin_name.plugin.tasks.delete
+        stop:
+          implementation: plugin_name.plugin.tasks.stop
+        restart:
+          implementation: plugin_name.plugin.tasks.restart
+        uninstall:
+          implementation: plugin_name.plugin.tasks.delete
+     

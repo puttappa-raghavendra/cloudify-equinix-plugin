@@ -16,3 +16,7 @@ To run the example plugin tests, the included `dev-requirements.txt` should be i
 ```
 pip install -r dev-requirements.txt
 ```
+
+# wagon build 
+
+docker run -v /Users/aryanraghav/dell-poc/cloudify-plugin-equinix/:/packaging cloudifyplatform/cloudify-ubuntu-18-04-py3-wagon-builder                   

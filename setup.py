@@ -41,12 +41,12 @@ def get_version(rel_file='plugin.yaml'):
 setup(
 
     # Do not use underscores in the plugin name.
-    name='ENTER-PLUGIN-NAME-HERE',
+    name='cloudify-equinix-metal-plugin',
 
     version=get_version(),
-    author='ENTER-AUTHOR-HERE',
-    author_email='ENTER-AUTHOR-EMAIL-HERE',
-    description='ENTER-DESCRIPTION-HERE',
+    author='Raghavendra Puttappa',
+    author_email='puttappa.raghavendra@gmail.com',
+    description='Plugin to demonstrate the use of cloudify plugin development and LCM',
 
     # This must correspond to the actual packages in the plugin.
     packages=find_packages(exclude=['tests*']),
