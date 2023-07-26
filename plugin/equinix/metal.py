@@ -2,11 +2,12 @@
 import requests
 from plugin.equinix.utils import NotFoundExcpetion, ServerNotAvailable
 
+EQIX_METAL_API = "https://api.equinix.com/metal/v1"
 
-class EquinixMetal:
+class Metal:
     
     def __init__(self, api_key, project_id, logger):
-        self.base_url = "https://api.equinix.com/metal/v1"
+        self.base_url = EQIX_METAL_API
         self.api_url = self.base_url + "/projects/{0}".format(project_id)
         self.logger = logger
         self.headers = {

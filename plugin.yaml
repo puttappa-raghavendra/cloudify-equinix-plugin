@@ -27,8 +27,31 @@ plugins:
 
 data_types:
 
+  cloudify.types.common.SSHConfig:
+    properties:
+      hostname: 
+        description: The hostname or IP address to connect to.
+        type: string
+        default: ''
+        required: true
+      username:
+        description: The username to use for authentication.
+        type: string
+        default: 'root'
+        required: false
+      privatekey:
+        description: The private key to use for authentication.
+        type: string
+        default: ''
+        required: true
+      commands:
+        description: The commands to execute.
+        type: list
+        default: []
+        required: true
+
   # you can build your data types for the properties that you will use inside the node_types
-  cloudify.types.template.EquinixMetalConfig:
+  cloudify.types.equinix.MetalConfig:
     properties:
       project_id:
         description: Your Equinix project id.
@@ -70,34 +93,55 @@ dsl_definitions:
 
   # you can define custom dsl defintions 
   # [ anchors that you can use to define common values or definitions between node definitions ]
-  equinix_config: &equinix_config
-    equinix_config:
-      type: cloudify.types.template.EquinixMetalConfig
+  metal_config: &metal_config
+    metal_config:
+      type: cloudify.types.equinix.MetalConfig
       description: Your Equinix Project configuration.
+      required: true
+
+  ssh_config: &ssh_config
+    ssh_config:
+      type: cloudify.types.common.SSHConfig
+      description: Your SSH Config
       required: true
 
 node_types:
 
   # you can define your node_types here 
-  cloudify.nodes.template.EquinixMetal:
+  cloudify.nodes.equinix.Metal:
     # you can use the derived_form 
     # [ to inherit the properties and interfaces of the node you are referencing ]
     derived_from: cloudify.nodes.Root
     # here you can add the properties that is relevant for you to interact with from the plugin python code
     properties:
-      <<: *equinix_config
+      <<: *metal_config
     interfaces:
       # you can define the lifecycle operation 
       # and whatever operation that you may need this node_type to support
       cloudify.interfaces.lifecycle:
         create:
-          implementation: plugin_name.plugin.tasks.create
+          implementation: plugin_name.plugin.equinix.plugin.create_metal_server
         delete:
-          implementation: plugin_name.plugin.tasks.delete
+          implementation: plugin_name.plugin.equinix.plugin.delete_metal_server
         stop:
-          implementation: plugin_name.plugin.tasks.stop
+          implementation: plugin_name.plugin.equinix.plugin.stop_metal_server
         restart:
-          implementation: plugin_name.plugin.tasks.restart
+          implementation: plugin_name.plugin.equinix.plugin.restart_metal_server
         uninstall:
-          implementation: plugin_name.plugin.tasks.delete
+          implementation: plugin_name.plugin.equinix.plugin.delete_metal_server
+  
+  # you can define your node_types here 
+  cloudify.nodes.common.ScriptRunner:
+    # you can use the derived_form 
+    # [ to inherit the properties and interfaces of the node you are referencing ]
+    derived_from: cloudify.nodes.Root
+    # here you can add the properties that is relevant for you to interact with from the plugin python code
+    properties:
+      <<: *ssh_config
+    interfaces:
+      # you can define the lifecycle operation 
+      # and whatever operation that you may need this node_type to support
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: plugin_name.plugin.common.plugin.execute
      

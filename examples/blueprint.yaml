@@ -8,10 +8,6 @@ imports:
 
 inputs:
 
-  project_id:
-    type: string
-  api_key:
-    type: string
   hostname:
     type: string
   metro:
@@ -33,22 +29,40 @@ inputs:
     type: string
     default: ''
 
+  commands:
+    type: list
+    default: []
+
 dsl_definitions:
 
-  equinix_config: &equinix_config
-    project_id: { get_input: project_id }
-    api_key: { get_input: api_key }
+  metal_config: &metal_config
+    project_id: { get_secret: equinix_project_id}
+    api_key: { get_secret: equinix_api_key}
     hostname: { get_input: hostname }
     metro: { get_input: metro }
     plan: { get_input: plan }
     operating_system: { get_input: operating_system }
+    userdata: { get_input: userdata }
+    
 
 node_templates:
 
   # actual node to be created with the type defined in the plugin
   equinix_metal:
-    type: cloudify.nodes.template.EquinixMetal
+    type: cloudify.nodes.equinix.Metal
     properties:
-      equinix_config: *equinix_config
+      metal_config: *metal_config
+
+
+  docker:
+    type: cloudify.nodes.common.ScriptRunner
+    properties:
+      ssh_config: 
+        hostname: { get_attribute: [ equinix_metal, ip ] }
+        commands: { get_input: commands }
+        privatekey: { get_secret: ssh_private_key}
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: equinix_metal
 
   
