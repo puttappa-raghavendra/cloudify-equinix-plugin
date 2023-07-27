@@ -44,7 +44,11 @@ dsl_definitions:
     operating_system: { get_input: operating_system }
     userdata: { get_input: userdata }
     
-
+  ssh_config: &ssh_config
+    host: { get_attribute: [ equinix_metal, ip ] }
+    commands: { get_input: commands }
+    privatekey: { get_secret: ssh_private_key}
+    
 node_templates:
 
   # actual node to be created with the type defined in the plugin
@@ -53,14 +57,13 @@ node_templates:
     properties:
       metal_config: *metal_config
 
-
   docker:
     type: cloudify.nodes.common.ScriptRunner
-    properties:
-      ssh_config: 
-        host: { get_attribute: [ equinix_metal, ip ] }
-        commands: { get_input: commands }
-        privatekey: { get_secret: ssh_private_key}
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: 
+          inputs:
+            ssh_config: *ssh_config
     relationships:
       - type: cloudify.relationships.depends_on
         target: equinix_metal

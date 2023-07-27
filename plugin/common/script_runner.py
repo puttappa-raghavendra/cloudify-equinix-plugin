@@ -3,8 +3,8 @@ import io
 
 class ScriptRunner: 
     
-    def __init__(self, hostname, username, private_key_str, logger) -> None:
-        self.hostname = hostname
+    def __init__(self, host, username, private_key_str, logger) -> None:
+        self.host = host
         self.username = username
         self.private_key_str = private_key_str
         self.logger = logger
@@ -22,7 +22,7 @@ class ScriptRunner:
             private_key = paramiko.RSAKey(file_obj=io.StringIO(self.private_key_str))
 
             # Connect to the remote server using the private key
-            ssh_client.connect(self.hostname, username=self.username, pkey=private_key)
+            ssh_client.connect(self.host, username=self.username, pkey=private_key)
 
             outputs = {}  # Dictionary to store the output of each command
 

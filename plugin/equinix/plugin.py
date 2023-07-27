@@ -55,10 +55,10 @@ def create_metal_server(ctx, **kwargs):
     _device_details = _client.get_device(_metal_server_id)
     
     ctx.instance.runtime_properties['metal_server'] = _device_details
+    # extract the ip address and log it
+    ctx.logger.info(f"IP address: {_device_details['ip_addresses'][0]['address']}")
     ctx.instance.runtime_properties['ip'] = _device_details["ip_addresses"][0]["address"]
     ctx.logger.info('Equinix Metal server & is ready for deployment')
-
-    return _device_details
 
 
 @operation

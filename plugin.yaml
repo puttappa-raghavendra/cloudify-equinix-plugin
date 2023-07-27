@@ -29,8 +29,8 @@ data_types:
 
   cloudify.types.common.SSHConfig:
     properties:
-      hostname: 
-        description: The hostname or IP address to connect to.
+      host: 
+        description: The IP address to connect to.
         type: string
         default: ''
         required: true

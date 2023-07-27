@@ -17,19 +17,19 @@ from plugin.common.script_runner import ScriptRunner
 @operation
 def execute(ctx, **kwargs):
     # getting ssh config from node properties
-    host_config = ctx.node.properties.get('ssh_config', {})
+    ssh_config = ctx.node.properties.get('ssh_config', {})
     
-    _hostname = host_config.get('hostname', '')
-    _username = host_config.get('username', '')
-    _privatekey = host_config.get('privatekey', '')
-    _commands = host_config.get('commands', [])
+    _host = ssh_config.get('host', '')
+    _username = ssh_config.get('username', '')
+    _privatekey = ssh_config.get('privatekey', '')
+    _commands = ssh_config.get('commands', [])
     
     ctx.logger.info(f'executing commands: {_commands}')
     # log the ssh config
-    ctx.logger.info('SSH config: {0}, {1}, {2}'.format( _hostname, _username, _privatekey))
+    ctx.logger.info('SSH config: {0}, {1}, {2}'.format( _host, _username, _privatekey))
     
-    _client = ScriptRunner(_hostname, _username, _privatekey, ctx.logger)
+    _client = ScriptRunner(_host, _username, _privatekey, ctx.logger)
     _cmd_outputs = _client.execute(_commands)
     
-    ctx.logger.info(f'commands output: {_cmd_outputs}')
+    ctx.logger.info(f'Commands output: {_cmd_outputs}')
     ctx.logger.info('SSH commands executed successfully')
